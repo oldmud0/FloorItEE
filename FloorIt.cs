@@ -34,23 +34,33 @@ namespace FloorIt
 		}
 		
 		public void Start() {
-			print("FloorIt Enterprise Edition enabled.\nLoaded commands: ");
+			string mesg = "";
+			
+			mesg += "FloorIt Enterprise Edition enabled.\nLoaded commands: ";
 			foreach(Trigger trigger in triggerList) 
-				print(trigger.name +" - "+ trigger.description + " ("+trigger.currentKey+") \n");
-		}
-		
-		void Update() {
-			foreach(Trigger trigger in triggerList) trigger.Listen();
+				mesg += trigger.name +" - "+ trigger.description + " ("+trigger.currentKey+") \n";
+			print(mesg);
 		}
 		
 		void OnDisable() {
 			configFile.save();
 		}
 		
+		void Update() {
+			if(Input.anyKeyDown)
+				foreach(Trigger trigger in triggerList) 
+					trigger.Listen();
+		}
+		
 		void addTriggers() {
 			triggerList.AddRange( new[] {
-				new Trigger("THROTTLE_TO_100", configFile.GetValue("THROTTLE_TO_100",KeyCode.Z), delegate {FlightInputHandler.state.mainThrottle = 1;}, "Throttle to 100%")
-			                     });
+				new Trigger("THROTTLE_TO_100", KeyCode.Z, 		      () => FlightInputHandler.state.mainThrottle = 1,                                              "Throttle to 100%"        ),
+				new Trigger("INCREMENT_BY_X",  KeyCode.KeypadPlus,    () => FlightInputHandler.state.mainThrottle += configFile.GetValue("INCREMENT_AMOUNT", .25f), "Increment throttle by X" ),
+				new Trigger("DECREMENT_BY_X",  KeyCode.KeypadEnter,   () => FlightInputHandler.state.mainThrottle -= configFile.GetValue("DECREMENT_AMOUNT", .25f), "Decrement throttle by X" ),
+				new Trigger("SET_CUSTOM_1",    KeyCode.KeypadDivide,  () => FlightInputHandler.state.mainThrottle -= configFile.GetValue("CUSTOM_1_VALUE", .25f),   "Set custom value (key 1)"),
+				new Trigger("SET_CUSTOM_2",    KeyCode.KeypadMultiply,() => FlightInputHandler.state.mainThrottle -= configFile.GetValue("CUSTOM_2_VALUE", .5f),    "Set custom value (key 2)"),
+				new Trigger("SET_CUSTOM_3",    KeyCode.KeypadMinus,   () => FlightInputHandler.state.mainThrottle -= configFile.GetValue("CUSTOM_3_VALUE", .75f),   "Set custom value (key 3)")
+                });
 		}
 		
 	}

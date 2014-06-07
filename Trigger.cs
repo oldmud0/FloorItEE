@@ -10,20 +10,26 @@ namespace FloorIt
 	public class Trigger
 	{
 		public readonly KeyCode currentKey;
-		public readonly string name, description;
+		public readonly string name, description, nameAsStoredInConfigFile;
+		public bool enabled;
+		
+		public const string defaultDescription = "N/A";
 		
 		public delegate void Fire();
 		public readonly Fire fireEvent;
 		
-		public Trigger(string name, KeyCode key, Fire fireEvent, string description = "Unnamed trigger") {
+		public Trigger(string name, KeyCode defaultKey, Fire fireEvent, string description = defaultDescription) {
 			this.name = name;
-			this.currentKey = key;
+			//this.nameAsStoredInConfigFile = name + (description != defaultDescription ? (" ("+ description +")")); //NAME (description if available)
+			this.nameAsStoredInConfigFile = name; //NAME;
+			this.enabled = FloorItPlugin.configFile.GetValue(nameAsStoredInConfigFile + "_ENABLED", true);
+			this.currentKey = FloorItPlugin.configFile.GetValue(nameAsStoredInConfigFile, defaultKey);
 			this.fireEvent = fireEvent;
 			this.description = description;
 		}
 		
 		protected internal void Listen() {
-			if(Input.GetKeyDown(currentKey))
+			if(enabled && Input.GetKeyDown(currentKey))
 				fireEvent();
 		}
 		
