@@ -6,7 +6,6 @@ namespace FloorIt
 	/// <summary>
 	/// Defines fields that triggers will use.
 	/// </summary>
-	[Trigger]
 	public class Trigger
 	{
 		public readonly KeyCode currentKey;
@@ -17,6 +16,10 @@ namespace FloorIt
 		
 		public delegate void Fire();
 		public readonly Fire fireEvent;
+		
+		public delegate void Init();
+		private Init initEvent = delegate {return;};
+		public Init InitEvent {get {return initEvent;} set {initEvent();}}
 		
 		public Trigger(string name, KeyCode defaultKey, Fire fireEvent, string description = defaultDescription) {
 			this.name = name;
